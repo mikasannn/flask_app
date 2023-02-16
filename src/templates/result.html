@@ -1,8 +1,7 @@
 <title>Input From Test App</title>
-% if outputname %
-   <h1>入力された文字は{{ outputname }}です</h1>
-   <a href="./">トップへ戻る</a>
-
-% else %
-  <a href="./">トップへ戻る</a>
-% endif %
+{% if outputname %}
+    <h1>入力された文字は {{ outputname }} です</h1>
+    <a href="./">トップへ戻る</a>
+{% else %}
+    <a href="./">トップへ戻る</a>
+{% endif %}

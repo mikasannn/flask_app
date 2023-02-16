@@ -1,20 +1,10 @@
-<title>Input Form Test App</title>
-<style>
-    #wrapper {
-    text-align: center;
-}
-</style>
-
-<div id ="wrapper">
-    <h1>文字を入力してください</h1>
-    <form method="post"
-          {{ forms.csrf_token}}
-
-          {{ forms.InputFormTest.label }}<br>
-          {{ forms.InputFormTest }}<br>
-          <br>
-
-          {{ forms.submit }}
-    </form>
-
-</div>
+<!DOCTYPE html>
+<html lang="ja" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+  </head>
+  <body>
+    {{message}}
+  </body>
+</html>
