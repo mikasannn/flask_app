@@ -1,3 +1,4 @@
+'''
 # coding: utf-8
 
 from flask import Flask, render_template
@@ -17,4 +18,4 @@ def index():
 # メイン関数
 if __name__ == '__main__':
     app.run()
-
+'''
