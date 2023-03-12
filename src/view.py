@@ -1,21 +1,23 @@
-'''
 # coding: utf-8
 
-from flask import Flask, render_template
+#　必要なモジュールのインポート
+# from flask import Flask, render_template, make_response, request, jsonify
+from flask import Flask, request, jsonify
 
 # app という変数でFlaskオブジェクトをインスタンス化
 app = Flask(__name__)
 
-# --- View 側の設定 ---
-# rootディレクトリにアクセスした場合の挙動
-@app.route('/')
-
-# def 以下がアクセス後の操作
+@app.route('/', methods = ['GET', 'POST'])
 def index():
-    # return 'Hello World!'
-    return render_template('index.html') #追加
+    # Slackから送られてくるPOSTリクエストのBodyの内容を取得
+    json =  request.json
+    print(json)
+    # レスポンス用のJSONデータを作成
+    # 受け取ったchallengeのKey/Valueをそのまま返却する
+    d = {'challenge' : json["challenge"]}
+    # レスポンスとしてJSON化して返却
+    return jsonify(d)
 
-# メイン関数
 if __name__ == '__main__':
-    app.run()
-'''
+    app.run(debug=True)
+
