@@ -7,6 +7,13 @@ SLACK_SIGNING_SECRET = '5b67a7ce8fd3c9eb8f39a9941da7a86c'
 SLACK_BOT_TOKEN = ''
 SLACK_BOT_TOKEN = os.getenv('SLACK_BOT_TOKEN')
 
+import logging
+logging.basicConfig(
+    level=logging.DEBUG, # ログの出力レベルを指定します。DEBUG, INFO, WARNING, ERROR, CRITICALから選択できます。
+    format='%(asctime)s %(levelname)s %(message)s', # ログのフォーマットを指定します。
+    datefmt='%Y-%m-%d %H:%M:%S' # ログの日付時刻フォーマットを指定します。
+)
+
 app = Flask(__name__)
 
 client = slack.WebClient(token=SLACK_BOT_TOKEN)
