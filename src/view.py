@@ -93,7 +93,7 @@ def respond_message(payload):
         answers.append(row[5])
 
 
-    input_sentence="iphoneの設定方法がわかりません"
+    input_sentence=text
 
     scores = calc_similarity(model, tokenizer,sentences,input_sentence)
     logging.debug(str(scores))
@@ -138,7 +138,7 @@ def respond_message(payload):
 
     #~~~~~~【ここまで】コラボ貼り付け~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
-    auto_answers=text
+    #text_answers=text
     # もしボット以外の人からの投稿だった場合
     if BOT_USER_ID != user_id:
         # chat_postMessageメソッドでオウム返しを実行
