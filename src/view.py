@@ -100,7 +100,7 @@ def respond_message(payload):
 
 
 
-    '''
+    
     for index, score in enumerate(scores):
         if score > 0.8:
             print(str(index) + ":" + str(score) + ":" + sentences[index])
@@ -121,6 +121,7 @@ def respond_message(payload):
         print(str(i) + ":" + str(scores[i]) + ":" + sentences[i])
 
     #if文
+    auto_answers = []
     if scores[sorted_score[0]] >=0.95:
         print(sentences[sorted_score[0]])
         print(answers[sorted_score[0]])    
@@ -136,12 +137,12 @@ def respond_message(payload):
         print('よくある質問ではないようです。担当者へ問い合わせください。')
 
     #~~~~~~【ここまで】コラボ貼り付け~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    '''
+    
     output_text=text
     # もしボット以外の人からの投稿だった場合
     if BOT_USER_ID != user_id:
         # chat_postMessageメソッドでオウム返しを実行
-        client.chat_postMessage(channel=channel_id, text=output_text)
+        client.chat_postMessage(channel=channel_id, text=auto_answers)
 
 if __name__ == "__main__":
     app.run(debug=True)
