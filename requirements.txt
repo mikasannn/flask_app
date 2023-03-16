@@ -9,4 +9,5 @@ MarkupSafe==2.1.1
 Werkzeug==2.1.2
 slackeventsapi
 slackclient
-
+numpy==-1.24.2
+pandas==1.5.3
