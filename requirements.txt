@@ -12,5 +12,6 @@ slackeventsapi
 slackclient
 transformers
 sentence_transformers
-fugashiipadic
+fugashi
+ipadic
 pandas
