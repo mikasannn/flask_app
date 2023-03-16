@@ -15,3 +15,4 @@ sentence_transformers
 fugashi
 ipadic
 pandas
+slack_sdk
