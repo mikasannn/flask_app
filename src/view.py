@@ -58,7 +58,6 @@ def sentence_to_vector(model, tokenizer, sentence):
   return averaged_hidden_state
 
 
-
 @slack_event_adapter.on('message')
 def respond_message(payload):
     # payloadの中の'event'に関する情報を取得し、もし空なら空のディクショナリ{}をあてがう
@@ -92,14 +91,10 @@ def respond_message(payload):
     for row in df.itertuples():
         answers.append(row[5])
 
-
     input_sentence=text
 
     scores = calc_similarity(model, tokenizer,sentences,input_sentence)
     logging.debug(str(scores))
-
-
-
     
     for index, score in enumerate(scores):
         if score > 0.8:
@@ -121,7 +116,14 @@ def respond_message(payload):
         print(str(i) + ":" + str(scores[i]) + ":" + sentences[i])
 
     #if文
-    auto_answers = []
+    if scores[sorted_score[0]] >= 0.95:
+        result = f"{sentences[sorted_score[0]]}\n{answers[sorted_score[0]]}"
+    elif 0.85 <= scores[sorted_score[0]] < 0.95:
+        result = f"解答候補を３つ提示します。\n1{sentences[sorted_score[0]]}\n{answers[sorted_score[0]]}\n2{sentences[sorted_score[1]]}\n{answers[sorted_score[1]]}\n3{sentences[sorted_score[2]]}\n{answers[sorted_score[2]]}"
+    else:
+        result = 'よくある質問ではないようです。担当者へ問い合わせください。'
+    print(result)
+    '''
     if scores[sorted_score[0]] >=0.95:
         print(sentences[sorted_score[0]])
         print(answers[sorted_score[0]])    
@@ -135,14 +137,14 @@ def respond_message(payload):
         print(answers[sorted_score[2]])
     else:
         print('よくある質問ではないようです。担当者へ問い合わせください。')
-
+    '''
     #~~~~~~【ここまで】コラボ貼り付け~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
-    #text_answers=text
+    result=text
     # もしボット以外の人からの投稿だった場合
     if BOT_USER_ID != user_id:
         # chat_postMessageメソッドでオウム返しを実行
-        client.chat_postMessage(channel=channel_id, text=auto_answers)
+        client.chat_postMessage(channel=channel_id, text=text)
 
 if __name__ == "__main__":
     app.run(debug=True)
