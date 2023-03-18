@@ -144,7 +144,7 @@ def respond_message(payload):
     # もしボット以外の人からの投稿だった場合
     if BOT_USER_ID != user_id:
         # chat_postMessageメソッドでオウム返しを実行
-        client.chat_postMessage(channel=channel_id, text=text)
+        client.chat_postMessage(channel=channel_id, text=result)
 
 if __name__ == "__main__":
     app.run(debug=True)
