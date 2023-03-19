@@ -140,7 +140,6 @@ def respond_message(payload):
     '''
     #~~~~~~【ここまで】コラボ貼り付け~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
-    result=text
     # もしボット以外の人からの投稿だった場合
     if BOT_USER_ID != user_id:
         # chat_postMessageメソッドでオウム返しを実行
