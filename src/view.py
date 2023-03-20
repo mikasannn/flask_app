@@ -118,9 +118,9 @@ def respond_message(payload):
 
     #if文
     if scores[sorted_score[0]] >= 0.95:
-        result = f"{sentences[sorted_score[0]]}\n{answers[sorted_score[0]]}"
+        result = f"{answers[sorted_score[0]]}"
     elif 0.85 <= scores[sorted_score[0]] < 0.95:
-        result = f"解答候補を３つ提示します。\n1.{sentences[sorted_score[0]]}\n{answers[sorted_score[0]]}\n2.{sentences[sorted_score[1]]}\n{answers[sorted_score[1]]}\n3.{sentences[sorted_score[2]]}\n{answers[sorted_score[2]]}"
+        result = f"解答候補を３つ提示します。\n1.{answers[sorted_score[0]]}\n2.{answers[sorted_score[1]]}\n3.{answers[sorted_score[2]]}"
     else:
         result = 'よくある質問ではないようです。担当者へ問い合わせください。'
     print(result)
