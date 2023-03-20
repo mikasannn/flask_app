@@ -12,6 +12,7 @@ import pandas as pd
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 from scipy.special import eval_sh_legendre
+from transformers import AutoTokenizer, AutoModel
 
 
 SLACK_SIGNING_SECRET = '5b67a7ce8fd3c9eb8f39a9941da7a86c'
@@ -119,7 +120,7 @@ def respond_message(payload):
     if scores[sorted_score[0]] >= 0.95:
         result = f"{sentences[sorted_score[0]]}\n{answers[sorted_score[0]]}"
     elif 0.85 <= scores[sorted_score[0]] < 0.95:
-        result = f"解答候補を３つ提示します。\n1{sentences[sorted_score[0]]}\n{answers[sorted_score[0]]}\n2{sentences[sorted_score[1]]}\n{answers[sorted_score[1]]}\n3{sentences[sorted_score[2]]}\n{answers[sorted_score[2]]}"
+        result = f"解答候補を３つ提示します。\n1.{sentences[sorted_score[0]]}\n{answers[sorted_score[0]]}\n2.{sentences[sorted_score[1]]}\n{answers[sorted_score[1]]}\n3.{sentences[sorted_score[2]]}\n{answers[sorted_score[2]]}"
     else:
         result = 'よくある質問ではないようです。担当者へ問い合わせください。'
     print(result)
