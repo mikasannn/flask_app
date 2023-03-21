@@ -45,12 +45,6 @@ def calc_similarity(model, tokenizer,sentences, sentence2):
   # print(scores) 
   return scores
 
-#テキストをベクトル化したscoresをファイルに保存しておく
-#torch.save(scores,'scores_text.pt')
-
-#ファイルに保存したベクトル値を読み込む
-#scores = torch.load('scores_text.pt')
-
 #★コラボコードの関数は外にだした
 def sentence_to_vector(model, tokenizer, sentence):
   # 文を単語（=トークン）に区切って数字にラベル化　⇒　PCが処理できる入力形式に変換（それを実行するのがトークナイザ）形態素解析
