@@ -16,4 +16,3 @@ fugashi
 ipadic
 pandas
 slack_sdk
-SentenceBertJapanese
