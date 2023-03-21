@@ -46,10 +46,10 @@ def calc_similarity(model, tokenizer,sentences, sentence2):
   return scores
 
 #テキストをベクトル化したscoresをファイルに保存しておく
-torch.save(scores,'scores_text.pt')
+#torch.save(scores,'scores_text.pt')
 
 #ファイルに保存したベクトル値を読み込む
-scores = torch.load('scores_text.pt')
+#scores = torch.load('scores_text.pt')
 
 #★コラボコードの関数は外にだした
 def sentence_to_vector(model, tokenizer, sentence):
