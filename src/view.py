@@ -13,6 +13,7 @@ from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 from scipy.special import eval_sh_legendre
 from transformers import AutoTokenizer, AutoModel
+from flask import request
 
 
 SLACK_SIGNING_SECRET = '5b67a7ce8fd3c9eb8f39a9941da7a86c'
@@ -61,12 +62,13 @@ def sentence_to_vector(model, tokenizer, sentence):
 
 @slack_event_adapter.on('message')
 def respond_message(payload):
+    if request.headers.get('X-Slack-Retry-Num') is None:
     # payloadの中の'event'に関する情報を取得し、もし空なら空のディクショナリ{}をあてがう
-    event = payload.get('event', {})
-    # 投稿のチャンネルID、ユーザーID、投稿内容を取得
-    channel_id = event.get('channel')
-    user_id = event.get('user')
-    text = event.get('text')
+        event = payload.get('event', {})
+     # 投稿のチャンネルID、ユーザーID、投稿内容を取得
+        channel_id = event.get('channel')
+        user_id = event.get('user')
+        text = event.get('text')
 
     #~~~~~~【ここから】コラボ貼り付け~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
