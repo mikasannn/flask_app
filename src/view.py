@@ -109,7 +109,7 @@ def respond_message(payload):
     model = SentenceBertJapanese("sonoisa/sentence-bert-base-ja-mean-tokens-v2")
 
     #データの読み込み
-    df = pd.read_csv('/content/chatbot.csv',header=0,names=['No','Category', 'Title', 'question', 'answer'])
+    df = pd.read_csv('chatbot.csv',header=0,names=['No','Category', 'Title', 'question', 'answer'])
     #df.head()
 
     no = []
