@@ -14,7 +14,6 @@ from slack_sdk.errors import SlackApiError
 from scipy.special import eval_sh_legendre
 from transformers import AutoTokenizer, AutoModel
 from flask import request
-import torch.nn.functional as F
 
 
 SLACK_SIGNING_SECRET = '5b67a7ce8fd3c9eb8f39a9941da7a86c'
@@ -34,40 +33,7 @@ client = slack.WebClient(token=SLACK_BOT_TOKEN)
 BOT_USER_ID = client.api_call("auth.test")['user_id']
 slack_event_adapter = SlackEventAdapter(SLACK_SIGNING_SECRET,'/',app)
 
-class SentenceBertJapanese:
-    def __init__(self, model_name_or_path, device=None):
-        self.tokenizer = BertJapaneseTokenizer.from_pretrained(model_name_or_path)
-        self.model = BertModel.from_pretrained(model_name_or_path)
-        self.model.eval()
 
-        if device is None:
-            device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.device = torch.device(device)
-        self.model.to(device)
-
-    def _mean_pooling(self, model_output, attention_mask):
-        token_embeddings = model_output[0] #First element of model_output contains all token embeddings
-        input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
-        return torch.sum(token_embeddings * input_mask_expanded, 1) / torch.clamp(input_mask_expanded.sum(1), min=1e-9)
-
-    @torch.no_grad()
-    def encode(self, sentences, batch_size=8):
-        all_embeddings = []
-        iterator = range(0, len(sentences), batch_size)
-        for batch_idx in iterator:
-            batch = sentences[batch_idx:batch_idx + batch_size]
-
-            encoded_input = self.tokenizer.batch_encode_plus(batch, padding="longest", 
-                                           truncation=True, return_tensors="pt").to(self.device)
-            model_output = self.model(**encoded_input)
-            sentence_embeddings = self._mean_pooling(model_output, encoded_input["attention_mask"]).to('cpu')
-
-            all_embeddings.extend(sentence_embeddings)
-
-        # return torch.stack(all_embeddings).numpy()
-        return torch.stack(all_embeddings)
-    
-'''
 #文字の類似度計算（cos類似度）★コラボコードの関数は外にだした
 def calc_similarity(model, tokenizer,sentences, sentence2):
   sentence_vector2 = sentence_to_vector(model, tokenizer, sentence2)
@@ -92,7 +58,7 @@ def sentence_to_vector(model, tokenizer, sentence):
     last_hidden_state = outputs.last_hidden_state[0]
     averaged_hidden_state = last_hidden_state.sum(dim=0) / len(last_hidden_state) 
   return averaged_hidden_state
-'''
+
 
 @slack_event_adapter.on('message')
 def respond_message(payload):
@@ -106,76 +72,75 @@ def respond_message(payload):
 
     #~~~~~~【ここから】コラボ貼り付け~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    model = SentenceBertJapanese("sonoisa/sentence-bert-base-ja-mean-tokens-v2")
+    MODEL_NAME = 'cl-tohoku/bert-base-japanese-whole-word-masking'
+
+    tokenizer = BertJapaneseTokenizer.from_pretrained(MODEL_NAME)
+    model = BertModel.from_pretrained(MODEL_NAME)
 
     #データの読み込み
-    df = pd.read_csv('/content/chatbot.csv',header=0,names=['No','Category', 'Title', 'question', 'answer'])
-    #df.head()
+    df = pd.read_csv('chatbot.csv',header=0,names=['No','Category', 'Title', 'question', 'answer'])
+    #df.head(3)
 
-    no = []
+    #データの抽出
+    #for row in df.itertuples():
+    #   print(row[4])
+
+    #for(ループ)でdfの中を1行ずつ取り出してrow(変数)へ入れて表示する。
     sentences = []
+    for row in df.itertuples():
+        sentences.append(row[4])
+
     answers = []
     for row in df.itertuples():
-        no.append(row[1])
-        sentences.append(row[4])
         answers.append(row[5])
 
-    print(no)
-    print(sentences)
-    print(answers)
+    input_sentence=text
 
-
-    #変数sentencesに格納された文章の数をカウント（質問数のこと15×10）
-    sentences_size = len(sentences)
-    print(sentences_size)
+    scores = calc_similarity(model, tokenizer,sentences,input_sentence)
+    logging.debug(str(scores))
     
-    #vector_text.ptファイルが存在していて、かつ、行数が現在のchatobot.csvと一致していたら、
-    #ベクトル化せずに、すでに前にベクトル化したものを使う。
-    #※ファイルがなかったり、chatbot.csvの行数が増えてたりしたら、普通にベクトル化する。
-    chatbotcsv_encode_skip = False
-    if  os.path.exists('vector_text.pt'):
-        vecs = torch.load('vector_text.pt')
-        if len(vecs) == sentences_size:
-            chatbotcsv_encode_skip = True
-
-    if chatbotcsv_encode_skip == False:
-        vecs = model.encode(sentences, batch_size=sentences_size)
-        torch.save(vecs,'vector_text.pt')
-
-    input_text=text
-    vecs2 = model.encode(input_text, batch_size=1)
-
-    scores = F.cosine_similarity(vecs2, vecs).tolist()
-    scores
+    for index, score in enumerate(scores):
+        if score > 0.8:
+            print(str(index) + ":" + str(score) + ":" + sentences[index])
+            #str関数は文字列
 
     # 最もscoreが高いものを取得
     index = scores.index(max(scores))
     print(sentences[index])
     print(scores[index])
-    
+
+    # scoreが高い順に表示
+    # print(scores)
+    #argsort関数は並び替えする関数。(scores)が並び替えたい引数。[::-1]
+    #sorted_scoreはコサイン類似度ではなくインデックス数がはいってる
     sorted_score=np.argsort(scores)[::-1]
-    sorted_score
+    # print(sorted_score)
+    for i in sorted_score:
+        print(str(i) + ":" + str(scores[i]) + ":" + sentences[i])
 
-    if scores[sorted_score[0]] >= 0.65:
+    #if文
+    if scores[sorted_score[0]] >= 0.95:
         result = f"{answers[sorted_score[0]]}"
-    elif 0.4 <= scores[sorted_score[0]] < 0.64:
-        result = "解答候補を３つ提示します。\n"
-
-    used_no = []
-    max_no = 3
-    for i in range(len(scores)):
-        if no[sorted_score[i]] not in used_no:
-            #print(str(i)+', score='+str(scores[sorted_score[i]])+', no='+str(no[sorted_score[i]])+', sentences='+str(sentences[sorted_score[i]])+', answesr='+str(answers[sorted_score[i]]))
-            result += f"{len(used_no)+1}. {answers[sorted_score[i]]}\n\n"
-            used_no.append(no[sorted_score[i]])
-
-        if len(used_no)==max_no:
-            break
-
+    elif 0.85 <= scores[sorted_score[0]] < 0.95:
+        result = f"解答候補を３つ提示します。\n1.{answers[sorted_score[0]]}\n\n2.{answers[sorted_score[1]]}\n\n3.{answers[sorted_score[2]]}"
     else:
-        result = "よくある質問ではないようです。担当者へ問い合わせください。"
+        result = 'よくある質問ではないようです。担当者へ問い合わせください。'
     print(result)
-
+    '''
+    if scores[sorted_score[0]] >=0.95:
+        print(sentences[sorted_score[0]])
+        print(answers[sorted_score[0]])    
+    elif 0.85 <= scores[sorted_score[0]] < 0.95:
+        print('解答候補を３つ提示します。')
+        print('1'+ sentences[sorted_score[0]])
+        print(answers[sorted_score[0]])
+        print('2'+ sentences[sorted_score[1]])
+        print(answers[sorted_score[1]])
+        print('3'+ sentences[sorted_score[2]])
+        print(answers[sorted_score[2]])
+    else:
+        print('よくある質問ではないようです。担当者へ問い合わせください。')
+    '''
     #~~~~~~【ここまで】コラボ貼り付け~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     # もしボット以外の人からの投稿だった場合
