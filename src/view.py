@@ -111,7 +111,6 @@ def respond_message(payload):
     logging.debug('■len(vecs)='+str(len(vecs)))
     torch.save(vecs,'vector_text.pt')
     logging.debug('■torch.save end')
-    '''
     
     '''
     chatbotcsv_encode_skip = False
@@ -120,34 +119,35 @@ def respond_message(payload):
         if len(vecs) == sentences_size:
             chatbotcsv_encode_skip = True
 
+    logging.debug('■chatbotcsv_encode_skip='+str(chatbotcsv_encode_skip))
+
     if chatbotcsv_encode_skip == False:
         vecs = model.encode(sentences, batch_size=sentences_size)
         torch.save(vecs,'vector_text.pt')
-    '''
+    
     '''
     logging.debug('■len(vecs)='+str(len(vecs)))
-    '''
+    
     input_text = ['MerQNetへ接続できないんですが対処法はありますか。']
     vecs2 = model.encode(input_text, batch_size=1)
-    '''
+    
     input_text=text
     vecs2 = model.encode(input_text, batch_size=1)
     
     logging.debug('■input_text='+str(input_text))
     logging.debug('■len(vecs2)='+str(len(vecs2)))
-    '''
+    
 
     scores = F.cosine_similarity(vecs2, vecs).tolist()
     logging.debug('■len(scores)='+str(len(scores)))
     scores
-
     '''
     input_text=text
     vecs2 = model.encode(input_text, batch_size=1)
 
     scores = F.cosine_similarity(vecs2, vecs).tolist()
     scores
-    '''
+
     # 最もscoreが高いものを取得
     index = scores.index(max(scores))
     print(sentences[index])
