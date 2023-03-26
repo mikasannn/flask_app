@@ -106,12 +106,12 @@ def respond_message(payload):
     #vector_text.ptファイルが存在していて、かつ、行数が現在のchatobot.csvと一致していたら、
     #ベクトル化せずに、すでに前にベクトル化したものを使う。
     #※ファイルがなかったり、chatbot.csvの行数が増えてたりしたら、普通にベクトル化する。
-    
+    '''
     vecs = model.encode(sentences, batch_size=sentences_size)
     logging.debug('■len(vecs)='+str(len(vecs)))
     torch.save(vecs,'vector_text.pt')
     logging.debug('■torch.save end')
-    
+    '''
     
     '''
     chatbotcsv_encode_skip = False
@@ -125,8 +125,12 @@ def respond_message(payload):
         torch.save(vecs,'vector_text.pt')
     '''
     logging.debug('■len(vecs)='+str(len(vecs)))
+    input_text = ['MerQNetへ接続できないんですが対処法はありますか。']
+    vecs2 = model.encode(input_text, batch_size=1)
+    '''
     input_text=text
     vecs2 = model.encode(input_text, batch_size=1)
+    '''
     logging.debug('■input_text='+str(input_text))
     logging.debug('■len(vecs2)='+str(len(vecs2)))
 
