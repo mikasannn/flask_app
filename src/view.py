@@ -106,6 +106,14 @@ def respond_message(payload):
     #vector_text.ptファイルが存在していて、かつ、行数が現在のchatobot.csvと一致していたら、
     #ベクトル化せずに、すでに前にベクトル化したものを使う。
     #※ファイルがなかったり、chatbot.csvの行数が増えてたりしたら、普通にベクトル化する。
+    
+    vecs = model.encode(sentences, batch_size=sentences_size)
+    logging.debug('■len(vecs)='+str(len(vecs)))
+    torch.save(vecs,'vector_text.pt')
+    logging.debug('■torch.save end')
+    
+    
+    '''
     chatbotcsv_encode_skip = False
     if  os.path.exists('vector_text.pt'):
         vecs = torch.load('vector_text.pt')
@@ -115,7 +123,7 @@ def respond_message(payload):
     if chatbotcsv_encode_skip == False:
         vecs = model.encode(sentences, batch_size=sentences_size)
         torch.save(vecs,'vector_text.pt')
-
+    '''
     logging.debug('■len(vecs)='+str(len(vecs)))
     input_text=text
     vecs2 = model.encode(input_text, batch_size=1)
@@ -146,16 +154,16 @@ def respond_message(payload):
     elif 0.4 <= scores[sorted_score[0]] < 0.64:
         result = "解答候補を３つ提示します。\n"
 
-    used_no = []
-    max_no = 3
-    for i in range(len(scores)):
-        if no[sorted_score[i]] not in used_no:
-            #print(str(i)+', score='+str(scores[sorted_score[i]])+', no='+str(no[sorted_score[i]])+', sentences='+str(sentences[sorted_score[i]])+', answesr='+str(answers[sorted_score[i]]))
-            result += f"{len(used_no)+1}. {answers[sorted_score[i]]}\n\n"
-            used_no.append(no[sorted_score[i]])
+        used_no = []
+        max_no = 3
+        for i in range(len(scores)):
+            if no[sorted_score[i]] not in used_no:
+                #print(str(i)+', score='+str(scores[sorted_score[i]])+', no='+str(no[sorted_score[i]])+', sentences='+str(sentences[sorted_score[i]])+', answesr='+str(answers[sorted_score[i]]))
+                result += f"{len(used_no)+1}. {answers[sorted_score[i]]}\n\n"
+                used_no.append(no[sorted_score[i]])
 
-        if len(used_no)==max_no:
-            break
+            if len(used_no)==max_no:
+                break
 
     else:
         result = "よくある質問ではないようです。担当者へ問い合わせください。"
