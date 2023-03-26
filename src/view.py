@@ -159,7 +159,7 @@ def respond_message(payload):
 
     if scores[sorted_score[0]] >= 0.65:
         result = f"{answers[sorted_score[0]]}"
-    elif 0.4 <= scores[sorted_score[0]] < 0.65:
+    elif 0.55 <= scores[sorted_score[0]] < 0.65:
         result = "解答候補を３つ提示します。\n"
 
         used_no = []
