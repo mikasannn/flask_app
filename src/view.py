@@ -142,7 +142,8 @@ def respond_message(payload):
     logging.debug('■len(scores)='+str(len(scores)))
     scores
     '''
-    input_text=text
+    input_text = []
+    input_text.append(text)
     vecs2 = model.encode(input_text, batch_size=1)
 
     scores = F.cosine_similarity(vecs2, vecs).tolist()
@@ -158,7 +159,7 @@ def respond_message(payload):
 
     if scores[sorted_score[0]] >= 0.65:
         result = f"{answers[sorted_score[0]]}"
-    elif 0.4 <= scores[sorted_score[0]] < 0.64:
+    elif 0.4 <= scores[sorted_score[0]] < 0.65:
         result = "解答候補を３つ提示します。\n"
 
         used_no = []
