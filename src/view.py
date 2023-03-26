@@ -67,32 +67,6 @@ class SentenceBertJapanese:
         # return torch.stack(all_embeddings).numpy()
         return torch.stack(all_embeddings)
     
-'''
-#文字の類似度計算（cos類似度）★コラボコードの関数は外にだした
-def calc_similarity(model, tokenizer,sentences, sentence2):
-  sentence_vector2 = sentence_to_vector(model, tokenizer, sentence2)
-  scores = []
- #複数(15個の質問文)のsentenceを計算し、scores = []の中に追加していく
-  for sentence in sentences:
-        sentence_vector1 = sentence_to_vector(model, tokenizer, sentence)
-        scores.append(torch.nn.functional.cosine_similarity(sentence_vector1, sentence_vector2, dim=0).detach().numpy().copy())
-
-  # print(scores) 
-  return scores
-
-#★コラボコードの関数は外にだした
-def sentence_to_vector(model, tokenizer, sentence):
-  # 文を単語（=トークン）に区切って数字にラベル化　⇒　PCが処理できる入力形式に変換（それを実行するのがトークナイザ）形態素解析
-  tokens = tokenizer(sentence)["input_ids"]
-  # BERTモデルの処理のためtensor型に変換
-  input = torch.tensor(tokens).reshape(1,-1)
-  # BERTモデルに入力し文のベクトルを取得
-  with torch.no_grad():
-    outputs = model(input, output_hidden_states=True)
-    last_hidden_state = outputs.last_hidden_state[0]
-    averaged_hidden_state = last_hidden_state.sum(dim=0) / len(last_hidden_state) 
-  return averaged_hidden_state
-'''
 
 @slack_event_adapter.on('message')
 def respond_message(payload):
@@ -142,12 +116,23 @@ def respond_message(payload):
         vecs = model.encode(sentences, batch_size=sentences_size)
         torch.save(vecs,'vector_text.pt')
 
+    logging.debug('■len(vecs)='+str(len(vecs)))
+    input_text=text
+    vecs2 = model.encode(input_text, batch_size=1)
+    logging.debug('■input_text='+str(input_text))
+    logging.debug('■len(vecs2)='+str(len(vecs2)))
+
+    scores = F.cosine_similarity(vecs2, vecs).tolist()
+    logging.debug('■len(scores)='+str(len(scores)))
+    scores
+
+    '''
     input_text=text
     vecs2 = model.encode(input_text, batch_size=1)
 
     scores = F.cosine_similarity(vecs2, vecs).tolist()
     scores
-
+    '''
     # 最もscoreが高いものを取得
     index = scores.index(max(scores))
     print(sentences[index])
